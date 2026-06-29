@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Personal Dashboard — Hemby Point Advisory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:#faf7f2;--warm-white:#fffefb;--gold:#b8963e;--gold-light:#e8d5a3;
+    --gold-dim:rgba(184,150,62,0.12);--ink:#1c1a17;--ink-muted:#6b6455;
+    --ink-dim:#a89e8f;--border:#e8e2d9;--border-strong:#d4ccbf;--rose:#c47a6e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--cream);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;}
+  .site-header{background:var(--warm-white);border-bottom:1px solid var(--border);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;}
+  .logo-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;letter-spacing:0.5px;}
+  .logo-sub{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-top:1px;}
+  .header-note{font-size:12px;color:var(--ink-dim);font-style:italic;}
+  .hero{text-align:center;padding:56px 24px 40px;max-width:620px;margin:0 auto;}
+  .hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+  .hero-title{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:400;line-height:1.1;margin-bottom:16px;}
+  .hero-title em{font-style:italic;color:var(--gold);}
+  .hero-body{font-size:15px;line-height:1.7;color:var(--ink-muted);font-weight:300;}
+  .progress-wrap{max-width:620px;margin:0 auto 36px;padding:0 24px;}
+  .progress-track{height:2px;background:var(--border);border-radius:99px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--gold);border-radius:99px;transition:width 0.4s ease;}
+  .progress-label{display:flex;justify-content:space-between;margin-top:8px;}
+  .progress-label span{font-size:11px;color:var(--ink-dim);}
+  .progress-label strong{font-size:11px;color:var(--gold);font-weight:600;}
+  .form-wrap{max-width:620px;margin:0 auto;padding:0 24px 80px;}
+  .step{display:none;animation:fadeIn 0.3s ease;}
+  .step.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .step-number{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+  .step-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:400;line-height:1.2;margin-bottom:8px;}
+  .step-desc{font-size:14px;color:var(--ink-muted);line-height:1.6;font-weight:300;margin-bottom:28px;}
+  .field-group{margin-bottom:22px;}
+  .field-label{display:block;font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--ink);margin-bottom:7px;}
+  .field-hint{font-size:12px;color:var(--ink-dim);margin-bottom:7px;font-weight:300;font-style:italic;}
+  input[type=text],input[type=email],input[type=date],textarea,select{width:100%;background:var(--warm-white);border:1px solid var(--border-strong);border-radius:8px;padding:12px 16px;font-family:'Inter',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
+  input:focus,textarea:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim);}
+  textarea{resize:vertical;min-height:76px;line-height:1.6;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .chip-group{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{padding:8px 15px;border:1px solid var(--border-strong);border-radius:99px;font-size:13px;color:var(--ink-muted);cursor:pointer;background:var(--warm-white);transition:all 0.15s;user-select:none;font-family:'Inter',sans-serif;}
+  .chip:hover{border-color:var(--gold);color:var(--gold);}
+  .chip.selected{background:var(--gold-dim);border-color:var(--gold);color:var(--gold);font-weight:500;}
+  .toggle-group{display:flex;border:1px solid var(--border-strong);border-radius:8px;overflow:hidden;}
+  .toggle-opt{flex:1;padding:10px 8px;text-align:center;font-size:12px;color:var(--ink-muted);cursor:pointer;background:var(--warm-white);border-right:1px solid var(--border-strong);transition:all 0.15s;user-select:none;font-family:'Inter',sans-serif;line-height:1.3;}
+  .toggle-opt:last-child{border-right:none;}
+  .toggle-opt:hover{background:var(--cream);}
+  .toggle-opt.selected{background:var(--gold-dim);color:var(--gold);font-weight:600;}
+  .card-section{background:var(--warm-white);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:18px;}
+  .card-title{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .card-title::after{content:'';flex:1;height:1px;background:var(--border);}
+  .scale-group{display:flex;gap:8px;align-items:center;}
+  .scale-end{font-size:11px;color:var(--ink-dim);white-space:nowrap;min-width:58px;}
+  .scale-end:last-child{text-align:right;}
+  .scale-opts{display:flex;gap:6px;flex:1;justify-content:space-between;}
+  .scale-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border-strong);background:var(--warm-white);font-size:13px;font-weight:500;color:var(--ink-muted);cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;}
+  .scale-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .scale-btn.selected{background:var(--gold);border-color:var(--gold);color:white;}
+  .pet-entry{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;position:relative;}
+  .pet-title{font-size:12px;font-weight:600;color:var(--gold);margin-bottom:12px;}
+  .remove-pet{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--ink-dim);cursor:pointer;font-size:16px;}
+  .add-pet-btn{width:100%;padding:12px;border:1.5px dashed var(--border-strong);border-radius:8px;background:none;color:var(--ink-dim);font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.15s;margin-top:4px;}
+  .add-pet-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .form-nav{display:flex;align-items:center;justify-content:space-between;margin-top:36px;padding-top:24px;border-top:1px solid var(--border);}
+  .btn-back{font-size:13px;color:var(--ink-dim);cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;padding:10px 0;}
+  .btn-back:hover{color:var(--ink);}
+  .btn-next{background:var(--gold);color:white;border:none;border-radius:8px;padding:14px 32px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.15s;}
+  .btn-next:hover{background:#a07c2e;transform:translateY(-1px);}
+  .thankyou{display:none;text-align:center;padding:60px 24px;max-width:500px;margin:0 auto;}
+  .thankyou.active{display:block;animation:fadeIn 0.4s ease;}
+  .ty-icon{font-size:48px;margin-bottom:20px;}
+  .ty-title{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:400;margin-bottom:12px;}
+  .ty-body{font-size:15px;color:var(--ink-muted);line-height:1.7;font-weight:300;}
+  .setup-banner{background:var(--gold-dim);border:1px solid var(--gold-light);border-radius:8px;padding:14px 18px;font-size:12px;color:var(--ink-muted);line-height:1.7;margin-bottom:28px;}
+  .setup-banner strong{color:var(--gold);}
+  .setup-banner code{background:var(--border);padding:1px 5px;border-radius:3px;font-size:11px;}
+  .site-footer{text-align:center;padding:28px;font-size:12px;color:var(--ink-dim);border-top:1px solid var(--border);}
+  @media(max-width:600px){
+    .site-header{padding:16px 20px;}.hero{padding:36px 20px 28px;}.hero-title{font-size:36px;}
+    .form-wrap{padding:0 20px 60px;}.field-row{grid-template-columns:1fr;}
+    .toggle-group{flex-wrap:wrap;}.toggle-opt{border-right:none;border-bottom:1px solid var(--border-strong);}
+    .toggle-opt:last-child{border-bottom:none;}.header-note{display:none;}
+  }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div>
+    <div class="logo-name">Hemby Point</div>
+    <div class="logo-sub">Advisory</div>
+  </div>
+  <div class="header-note">Your answers stay between us ✦</div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">Custom Dashboard Intake</div>
+  <h1 class="hero-title">Built for <em>your</em> life,<br>not someone else's</h1>
+  <p class="hero-body">Answer honestly. No wrong answers — only ones that help me build something that actually fits how your brain works and what your life looks like right now.</p>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-track"><div class="progress-fill" id="pFill" style="width:9%"></div></div>
+  <div class="progress-label"><span id="pText">Step 1 of 11</span><strong id="pPct">9%</strong></div>
+</div>
+
+<div class="form-wrap">
+
+<!-- SETUP BANNER - remove after configuring Formspree -->
+<div class="setup-banner" id="setupBanner">
+  <strong>✦ One-time setup for Liah:</strong> To receive responses by email, go to <strong>formspree.io</strong>, sign up with hembypointadvisory@gmail.com, create a new form, and replace <code>YOUR_FORMSPREE_ID</code> in the script below with your form ID. Then remove this banner. Your Google Sheet: connect it inside Formspree dashboard under Integrations.
+</div>
+
+<!-- STEP 1 -->
+<div class="step active" id="step-1">
+  <div class="step-number">Step 01 — The Basics</div>
+  <h2 class="step-title">Let's start with you.</h2>
+  <p class="step-desc">Just the fundamentals so I can make this feel personal from the first screen.</p>
+  <div class="field-group">
+    <label class="field-label">What's your name? <span style="color:var(--rose)">*</span></label>
+    <input type="text" id="f-name" placeholder="First name is fine" />
+  </div>
+  <div class="field-group">
+    <label class="field-label">What's your email? <span style="color:var(--rose)">*</span></label>
+    <p class="field-hint">So Liah can follow up when your dashboard is ready</p>
+    <input type="email" id="f-email" placeholder="your@email.com" />
+  </div>
+  <div class="field-group">
+    <label class="field-label">What do you do for work?</label>
+    <input type="text" id="f-work" placeholder="e.g. Nurse, PM at a tech company, teacher, entrepreneur" />
+  </div>
+  <div class="field-group">
+    <label class="field-label">Do you have ADHD or struggle with focus, follow-through, or juggling too many things?</label>
+    <div class="toggle-group" id="tg-adhd">
+      <div class="toggle-opt" data-val="Yes, diagnosed ADHD">Yes, diagnosed</div>
+      <div class="toggle-opt" data-val="Same energy, undiagnosed">Same energy</div>
+      <div class="toggle-opt" data-val="No, but I'm busy">No, but busy</div>
+      <div class="toggle-opt" data-val="Not really">Not really</div>
+    </div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">What's your biggest struggle with staying organized right now?</label>
+    <textarea id="f-struggle" placeholder="Be honest — this is the most important question on this page"></textarea>
+  </div>
+  <div class="form-nav"><div></div><button class="btn-next" onclick="nextStep(1)">Continue →</button></div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="step-2">
+  <div class="step-number">Step 02 — Your World</div>
+  <h2 class="step-title">What's actually going on in your life?</h2>
+  <p class="step-desc">Select everything that's active right now — not aspirational, just real.</p>
+  <div class="field-group">
+    <label class="field-label">Which life areas do you want your dashboard to track? <span style="color:var(--rose)">*</span></label>
+    <p class="field-hint">Select all that apply</p>
+    <div class="chip-group" id="chips-areas">
+      <div class="chip" data-val="Faith / Spirituality">Faith / Spirituality</div>
+      <div class="chip" data-val="Fitness & Health">Fitness & Health</div>
+      <div class="chip" data-val="Career / Job">Career / Job</div>
+      <div class="chip" data-val="Business / Side hustle">Business / Side hustle</div>
+      <div class="chip" data-val="Finances">Finances</div>
+      <div class="chip" data-val="Relationships">Relationships</div>
+      <div class="chip" data-val="Moving / Housing">Moving / Housing</div>
+      <div class="chip" data-val="Education / School">Education / School</div>
+      <div class="chip" data-val="Mental health">Mental health</div>
+      <div class="chip" data-val="Sleep & Recovery">Sleep & Recovery</div>
+      <div class="chip" data-val="Nutrition & Diet">Nutrition & Diet</div>
+      <div class="chip" data-val="Certifications / Learning">Certifications / Learning</div>
+      <div class="chip" data-val="Creativity / Projects">Creativity / Projects</div>
+      <div class="chip" data-val="Social life">Social life</div>
+      <div class="chip" data-val="Travel">Travel</div>
+      <div class="chip" data-val="Habits I'm breaking">Habits I'm breaking</div>
+      <div class="chip" data-val="Home / Living space">Home / Living space</div>
+      <div class="chip" data-val="Pets">Pets</div>
+      <div class="chip" data-val="Family">Family</div>
+    </div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">Of those, which ONE is most important to you right now?</label>
+    <input type="text" id="f-priority" placeholder="e.g. My business — everything else comes after" />
+  </div>
+  <div class="field-group">
+    <label class="field-label">What's the one thing you keep dropping that you wish you didn't?</label>
+    <textarea id="f-dropping" placeholder="The thing that makes you feel guilty when you lay down at night..." rows="3"></textarea>
+  </div>
+  <div class="form-nav"><button class="btn-back" onclick="prevStep(2)">← Back</button><button class="btn-next" onclick="nextStep(2)">Continue →</button></div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="step-3">
+  <div class="step-number">Step 03 — Faith</div>
+  <h2 class="step-title">Your spiritual life.</h2>
+  <p class="step-desc">Skip this entire section if faith isn't part of your world — no explanation needed.</p>
+  <div class="field-group">
+    <label class="field-label">Do you have a faith or spiritual practice?</label>
+    <div class="toggle-group" id="tg-faith">
+      <div class="toggle-opt" data-val="Yes, actively">Yes, actively</div>
+      <div class="toggle-opt" data-val="Trying to be more consistent">Trying to be consistent</div>
+      <div class="toggle-opt" data-val="It's complicated">It's complicated</div>
+      <div class="toggle-opt" data-val="No / Skip">No / Skip</div>
+    </div>
+  </div>
+  <div class="card-section">
+    <div class="card-title">Bible / Scripture Reading</div>
+    <div class="field-group">
+      <label class="field-label">Are you following a reading plan?</label>
+      <div class="toggle-group" id="tg-bibleplan">
+        <div class="toggle-opt" data-val="Yes">Yes</div>
+        <div class="toggle-opt" data-val="No, I read when I can">Read when I can</div>
+        <div class="toggle-opt" data-val="Want to start one">Want to start</div>
+        <div class="toggle-opt" data-val="N/A">N/A</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">What does your faith practice look like day to day?</label>
+      <textarea id="f-faith-practice" placeholder="Bible reading, prayer, journaling, church, devotionals..." rows="3"></textarea>
+    </div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">What would "consistent" look like for you in this area?</label>
+    <input type="text" id="f-faith-goal" placeholder="e.g. Reading every morning before I open my phone" />
+  </div>
+  <div class="form-nav"><button class="btn-back" onclick="prevStep(3)">← Back</button><button class="btn-next" onclick="nextStep(3)">Continue →</button></div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step" id="step-4">
+  <div class="step-number">Step 04 — Fitness</div>
+  <h2 class="step-title">Your body, your movement.</h2>
+  <p class="step-desc">Tell me what's going on with fitness so the dashboard tracks it the right way.</p>
+  <div class="field-group">
+    <label class="field-label">What types of fitness do you do?</label>
+    <div class="chip-group" id="chips-fitness">
+      <div class="chip" data-val="Running">Running</div>
+      <div class="chip" data-val="Weight training">Weight training</div>
+      <div class="chip" data-val="Solidcore / Pilates">Solidcore / Pilates</div>
+      <div class="chip" data-val="Yoga">Yoga</div>
+      <div class="chip" data-val="Cycling / Spin">Cycling / Spin</div>
+      <div class="chip" data-val="Swimming">Swimming</div>
+      <div class="chip" data-val="Walking">Walking</div>
+      <div class="chip" data-val="Group fitness classes">Group classes</div>
+      <div class="chip" data-val="Sports">Sports</div>
+      <div class="chip" data-val="Home workouts">Home workouts</div>
+      <div class="chip" data-val="Want to start">Want to start</div>
+      <div class="chip" data-val="Not a fitness person">Not a fitness person</div>
+    </div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">Do you have any upcoming fitness events or deadlines?</label>
+    <div class="field-row">
+      <input type="text" id="f-fitness-event" placeholder="e.g. 5K race, Spartan Race" />
+      <input type="date" id="f-fitness-date" />
+    </div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">What's your weekly workout goal?</label>
+    <div class="chip-group" id="chips-freq">
+      <div class="chip" data-val="1-2x per week">1–2x / week</div>
+      <div class="chip" data-val="3x per week">3x / week</div>
+      <div class="chip" data-val="4x per week">4x / week</div>
+      <div class="chip" data-val="5+ times per week">5x+ / week</div>
+      <div class="chip" data-val="Daily movement">Daily movement</div>
+    </div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">Anything else about your fitness situation?</label>
+    <textarea id="f-fitness-notes" placeholder="Injuries, schedule constraints, what's been working, what hasn't..." rows="3"></textarea>
+  </div>
+  <div class="form-nav"><button class="btn-back" onclick="prevStep(4)">← Back</button><button class="btn-next" onclick="nextStep(4)">Continue →</button></div>
+</div>
+
+<!-- STEP 5 -->
+<div class="step" id="step-5">
+  <div class="step-number">Step 05 — Wellness</div>
+  <h2 class="step-title">Sleep, food, and your mind.</h2>
+  <p class="step-desc">Skip what doesn't apply.</p>
+  <div class="card-section">
+    <div class="card-title">Sleep & Recovery</div>
+    <div class="field-group">
+      <label class="field-label">How's your sleep?</label>
+      <div class="toggle-group" id="tg-sleep">
+        <div class="toggle-opt" data-val="Great, I'm consistent">Great</div>
+        <div class="toggle-opt" data-val="Hit or miss">Hit or miss</div>
+        <div class="toggle-opt" data-val="Terrible, I need help">Terrible</div>
+        <div class="toggle-opt" data-val="Not tracking it">Not tracking</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Sleep goal (hours per night)</label>
+      <div class="chip-group" id="chips-sleep-hrs">
+        <div class="chip" data-val="6 hours">6 hrs</div>
+        <div class="chip" data-val="7 hours">7 hrs</div>
+        <div class="chip" data-val="8 hours">8 hrs</div>
+        <div class="chip" data-val="8+ hours">8+ hrs</div>
+        <div class="chip" data-val="Not tracking sleep">Not tracking</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Any sleep or recovery habits you want to track?</label>
+      <input type="text" id="f-sleep-habits" placeholder="e.g. No phone after 10pm, consistent bedtime, morning water" />
+    </div>
+  </div>
+  <div class="card-section">
+    <div class="card-title">Nutrition & Diet</div>
+    <div class="field-group">
+      <label class="field-label">Nutrition goals you're working on</label>
+      <div class="chip-group" id="chips-nutrition">
+        <div class="chip" data-val="Eat cleaner overall">Eat cleaner</div>
+        <div class="chip" data-val="Track macros / calories">Track macros</div>
+        <div class="chip" data-val="Drink more water">More water</div>
+        <div class="chip" data-val="Meal prep consistency">Meal prep</div>
+        <div class="chip" data-val="Cut back on sugar / alcohol">Cut sugar/alcohol</div>
+        <div class="chip" data-val="Specific diet (keto, vegan, etc.)">Specific diet</div>
+        <div class="chip" data-val="Weight loss">Weight loss</div>
+        <div class="chip" data-val="Weight gain / muscle">Weight gain/muscle</div>
+        <div class="chip" data-val="Not tracking food">Not tracking food</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Anything specific about your nutrition?</label>
+      <textarea id="f-nutrition-notes" placeholder="Dietary restrictions, what you want to be more consistent about..." rows="2"></textarea>
+    </div>
+  </div>
+  <div class="card-section">
+    <div class="card-title">Mental Health</div>
+    <div class="field-group">
+      <label class="field-label">Mental health on your dashboard?</label>
+      <div class="toggle-group" id="tg-mentalhealth">
+        <div class="toggle-opt" data-val="Yes, I want to track it">Yes, track it</div>
+        <div class="toggle-opt" data-val="Just a daily mood check-in">Just mood check-in</div>
+        <div class="toggle-opt" data-val="No / Skip">No / Skip</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Are you in therapy or working with a mental health professional?</label>
+      <div class="toggle-group" id="tg-therapy">
+        <div class="toggle-opt" data-val="Yes">Yes</div>
+        <div class="toggle-opt" data-val="No, but I want to be">Want to be</div>
+        <div class="toggle-opt" data-val="No">No</div>
+        <div class="toggle-opt" data-val="Rather not say">Rather not say</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Any habits you're actively trying to break?</label>
+      <p class="field-hint">Doomscrolling, drinking, overspending, people pleasing — no judgment</p>
+      <textarea id="f-habits-breaking" placeholder="e.g. Stop scrolling until 2am, cut back on wine, stop saying yes to everything..." rows="2"></textarea>
+    </div>
+  </div>
+  <div class="form-nav"><button class="btn-back" onclick="prevStep(5)">← Back</button><button class="btn-next" onclick="nextStep(5)">Continue →</button></div>
+</div>
+
+<!-- STEP 6 -->
+<div class="step" id="step-6">
+  <div class="step-number">Step 06 — Career & Learning</div>
+  <h2 class="step-title">Where are you professionally?</h2>
+  <p class="step-desc">Helps me know what milestones and goals to build into your dashboard.</p>
+  <div class="card-section">
+    <div class="card-title">Career</div>
+    <div class="field-group">
+      <label class="field-label">Current career situation</label>
+      <div class="chip-group" id="chips-career">
+        <div class="chip" data-val="Employed full-time">Employed full-time</div>
+        <div class="chip" data-val="Contractor / Freelancer">Contractor / Freelancer</div>
+        <div class="chip" data-val="Job searching">Job searching</div>
+        <div class="chip" data-val="Recently started a new role">New role</div>
+        <div class="chip" data-val="Career pivoting">Career pivoting</div>
+        <div class="chip" data-val="Student">Student</div>
+        <div class="chip" data-val="Between things">Between things</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Career milestones you're working toward</label>
+      <textarea id="f-career-goals" placeholder="Promotion, new contract, salary negotiation, specific role..." rows="2"></textarea>
+    </div>
+  </div>
+  <div class="card-section">
+    <div class="card-title">Certifications & Learning</div>
+    <div class="field-group">
+      <label class="field-label">Certifications or courses you already have</label>
+      <textarea id="f-certs-have" placeholder="e.g. PMP, Google Analytics, Scrum Master..." rows="2"></textarea>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Certifications you're working toward or want to get</label>
+      <textarea id="f-certs-want" placeholder="e.g. AWS, Six Sigma, that Coursera course I keep putting off..." rows="2"></textarea>
+    </div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">Are you planning to go back to school?</label>
+    <div class="toggle-group" id="tg-school">
+      <div class="toggle-opt" data-val="Yes, applying now">Applying now</div>
+      <div class="toggle-opt" data-val="Already enrolled">Already enrolled</div>
+      <div class="toggle-opt" data-val="Thinking about it">Thinking about it</div>
+      <div class="toggle-opt" data-val="No">No</div>
+    </div>
+  </div>
+  <div class="form-nav"><button class="btn-back" onclick="prevStep(6)">← Back</button><button class="btn-next" onclick="nextStep(6)">Continue →</button></div>
+</div>
+
+<!-- STEP 7 -->
+<div class="step" id="step-7">
+  <div class="step-number">Step 07 — Business & Money</div>
+  <h2 class="step-title">The bag and the hustle.</h2>
+  <p class="step-desc">Skip what doesn't apply. Answer what does.</p>
+  <div class="card-section">
+    <div class="card-title">Business / Side Hustle</div>
+    <div class="field-group">
+      <label class="field-label">Do you have a business or side hustle?</label>
+      <div class="toggle-group" id="tg-biz">
+        <div class="toggle-opt" data-val="Yes, actively running it">Yes, active</div>
+        <div class="toggle-opt" data-val="Just starting">Just starting</div>
+        <div class="toggle-opt" data-val="Developing an idea">Developing an idea</div>
+        <div class="toggle-opt" data-val="No">No</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">What's the business? What do you do or want to do?</label>
+      <textarea id="f-biz-desc" placeholder="Name, what it is, who you serve, where you are in building it..." rows="3"></textarea>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Your #1 business goal right now</label>
+      <input type="text" id="f-biz-goal" placeholder="e.g. First paying client, launch my website, hit $5k/month" />
+    </div>
+  </div>
+  <div class="card-section">
+    <div class="card-title">Finances</div>
+    <div class="field-group">
+      <label class="field-label">Financial goals you're tracking</label>
+      <div class="chip-group" id="chips-money">
+        <div class="chip" data-val="Emergency fund">Emergency fund</div>
+        <div class="chip" data-val="Paying off debt">Paying off debt</div>
+        <div class="chip" data-val="Saving for something specific">Saving for something</div>
+        <div class="chip" data-val="Investing">Investing</div>
+        <div class="chip" data-val="Building business revenue">Business revenue</div>
+        <div class="chip" data-val="Moving fund">Moving fund</div>
+        <div class="chip" data-val="Budget tracking">Budget tracking</div>
+        <div class="chip" data-val="I don't track finances">Don't track finances</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Anything specific about your money goals?</label>
+      <textarea id="f-money-notes" placeholder="e.g. Save $10k by December, pay off my car, first revenue from my business..." rows="2"></textarea>
+    </div>
+  </div>
+  <div class="form-nav"><button class="btn-back" onclick="prevStep(7)">← Back</button><button class="btn-next" onclick="nextStep(7)">Continue →</button></div>
+</div>
+
+<!-- STEP 8 - PETS -->
+<div class="step" id="step-8">
+  <div class="step-number">Step 08 — Your Pets</div>
+  <h2 class="step-title">The real family members.</h2>
+  <p class="step-desc">Add as many pets as you have. Click "Skip" if you don't have any.</p>
+  <div id="pet-list"></div>
+  <button class="add-pet-btn" onclick="addPet()">+ Add a Pet</button>
+  <div class="form-nav"><button class="btn-back" onclick="prevStep(8)">← Back</button><button class="btn-next" onclick="nextStep(8)">Continue →</button></div>
+</div>
+
+<!-- STEP 9 -->
+<div class="step" id="step-9">
+  <div class="step-number">Step 09 — Personal Life</div>
+  <h2 class="step-title">The rest of your world.</h2>
+  <p class="step-desc">People, places, and things that matter outside of work and goals.</p>
+  <div class="card-section">
+    <div class="card-title">Relationships</div>
+    <div class="field-group">
+      <label class="field-label">Who are the people you want to make sure you don't lose touch with?</label>
+      <p class="field-hint">Names or types — partner, best friend, mom, sister, etc.</p>
+      <textarea id="f-people" placeholder="e.g. My boyfriend, my college bestie, my mom — I'm bad at texting back" rows="2"></textarea>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Are you in a relationship?</label>
+      <div class="toggle-group" id="tg-relationship">
+        <div class="toggle-opt" data-val="Yes">Yes</div>
+        <div class="toggle-opt" data-val="It's complicated">It's complicated</div>
+        <div class="toggle-opt" data-val="No">No</div>
+        <div class="toggle-opt" data-val="Rather not say">Rather not say</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Do you have nieces or nephews you want to keep up with?</label>
+      <input type="text" id="f-nieces" placeholder="e.g. Nephew Jaylen (5), niece Aaliyah (8) — birthdays I always forget" />
+    </div>
+  </div>
+  <div class="card-section">
+    <div class="card-title">Social Life & Community</div>
+    <div class="field-group">
+      <label class="field-label">How's your social life right now?</label>
+      <div class="toggle-group" id="tg-social">
+        <div class="toggle-opt" data-val="Very active">Very active</div>
+        <div class="toggle-opt" data-val="Could be better">Could be better</div>
+        <div class="toggle-opt" data-val="Intentionally solo right now">Intentionally solo</div>
+        <div class="toggle-opt" data-val="Want more community">Want more community</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Social goals or events you want to track</label>
+      <input type="text" id="f-social-goals" placeholder="e.g. Plan a girls trip, host a dinner, be more intentional about friendships" />
+    </div>
+  </div>
+  <div class="card-section">
+    <div class="card-title">Creativity & Projects</div>
+    <div class="field-group">
+      <label class="field-label">Any creative projects or hobbies you want to track?</label>
+      <p class="field-hint">Music, writing, content creation, art, photography, podcasting — anything</p>
+      <textarea id="f-creative" placeholder="e.g. I want to start a podcast, I've been putting off writing a book, I make music but never finish tracks..." rows="2"></textarea>
+    </div>
+  </div>
+  <div class="card-section">
+    <div class="card-title">Travel</div>
+    <div class="field-group">
+      <label class="field-label">Any trips planned or travel goals?</label>
+      <textarea id="f-travel" placeholder="e.g. Girls trip to Cancun in March, want to visit Italy by 35, bucket list destinations..." rows="2"></textarea>
+    </div>
+  </div>
+  <div class="card-section">
+    <div class="card-title">Home & Living Space</div>
+    <div class="field-group">
+      <label class="field-label">Are you moving or apartment hunting?</label>
+      <div class="toggle-group" id="tg-moving">
+        <div class="toggle-opt" data-val="Yes, actively looking">Actively looking</div>
+        <div class="toggle-opt" data-val="Thinking about it">Thinking about it</div>
+        <div class="toggle-opt" data-val="Working on current space">Working on current space</div>
+        <div class="toggle-opt" data-val="No">No</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Home goals you want to track</label>
+      <input type="text" id="f-home-goals" placeholder="e.g. Redecorate bedroom, save for down payment, finally unpack those boxes" />
+    </div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">Personal goals you want to see on your dashboard every day</label>
+    <textarea id="f-personal-goals" placeholder="Habits, growth goals, anything you want accountability for..." rows="3"></textarea>
+  </div>
+  <div class="form-nav"><button class="btn-back" onclick="prevStep(9)">← Back</button><button class="btn-next" onclick="nextStep(9)">Continue →</button></div>
+</div>
+
+<!-- STEP 10 -->
+<div class="step" id="step-10">
+  <div class="step-number">Step 10 — Look & Feel</div>
+  <h2 class="step-title">How should it feel when you open it?</h2>
+  <p class="step-desc">This shapes the visual experience — made for you, not generic.</p>
+  <div class="field-group">
+    <label class="field-label">Dark mode or light mode?</label>
+    <div class="toggle-group" id="tg-mode">
+      <div class="toggle-opt" data-val="Dark — deep, moody, rich">Dark — deep and moody</div>
+      <div class="toggle-opt" data-val="Light — clean and warm">Light — clean and warm</div>
+      <div class="toggle-opt" data-val="Either works">Either works</div>
+    </div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">What vibe should it have? (select all that resonate)</label>
+    <div class="chip-group" id="chips-vibe">
+      <div class="chip" data-val="Warm and cozy">Warm and cozy</div>
+      <div class="chip" data-val="Clean and minimal">Clean and minimal</div>
+      <div class="chip" data-val="Luxurious and editorial">Luxurious / editorial</div>
+      <div class="chip" data-val="Bold and energetic">Bold and energetic</div>
+      <div class="chip" data-val="Soft and feminine">Soft and feminine</div>
+      <div class="chip" data-val="Grounding and earthy">Grounding and earthy</div>
+      <div class="chip" data-val="Spiritual and sacred">Spiritual and sacred</div>
+      <div class="chip" data-val="Professional and sharp">Professional and sharp</div>
+      <div class="chip" data-val="Fun and colorful">Fun and colorful</div>
+    </div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">Colors you love or hate</label>
+    <input type="text" id="f-colors" placeholder="e.g. Love gold and dusty rose. Hate anything neon or bright green." />
+  </div>
+  <div class="field-group">
+    <label class="field-label">How personal should it feel? (1 = just data, 5 = greet me, motivate me, talk to me)</label>
+    <div class="scale-group" style="margin-top:8px">
+      <span class="scale-end">Just data</span>
+      <div class="scale-opts" id="scale-personal">
+        <button class="scale-btn" data-val="1">1</button>
+        <button class="scale-btn" data-val="2">2</button>
+        <button class="scale-btn" data-val="3">3</button>
+        <button class="scale-btn" data-val="4">4</button>
+        <button class="scale-btn" data-val="5">5</button>
+      </div>
+      <span class="scale-end">Very personal</span>
+    </div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">Do you want a daily morning text briefing?</label>
+    <p class="field-hint">A text each morning summarizing your day, tasks, and priorities</p>
+    <div class="toggle-group" id="tg-text">
+      <div class="toggle-opt" data-val="Yes please">Yes please</div>
+      <div class="toggle-opt" data-val="Maybe, tell me more">Maybe</div>
+      <div class="toggle-opt" data-val="No thanks">No thanks</div>
+    </div>
+  </div>
+  <div class="form-nav"><button class="btn-back" onclick="prevStep(10)">← Back</button><button class="btn-next" onclick="nextStep(10)">Continue →</button></div>
+</div>
+
+<!-- STEP 11 -->
+<div class="step" id="step-11">
+  <div class="step-number">Step 11 — Almost Done</div>
+  <h2 class="step-title">Last thing.</h2>
+  <p class="step-desc">Anything else before I build this for you.</p>
+  <div class="field-group">
+    <label class="field-label">Is there anything you've tried before that didn't work?</label>
+    <p class="field-hint">Notion, planners, other apps, systems you abandoned — this helps me avoid the same traps</p>
+    <textarea id="f-tried" placeholder="e.g. I set up Notion three times and never kept it up. Physical planners look cute but I never open them." rows="3"></textarea>
+  </div>
+  <div class="field-group">
+    <label class="field-label">What would make you open this dashboard every single morning?</label>
+    <textarea id="f-open-daily" placeholder="The design? Seeing everything in one place? A reminder text? Be honest." rows="3"></textarea>
+  </div>
+  <div class="field-group">
+    <label class="field-label">Anything else you want me to know before I build this?</label>
+    <textarea id="f-anything-else" placeholder="Surprises, context, a vision, something specific we didn't cover..." rows="4"></textarea>
+  </div>
+  <div class="form-nav"><button class="btn-back" onclick="prevStep(11)">← Back</button><button class="btn-next" onclick="submitForm()">Submit ✦</button></div>
+</div>
+
+</div><!-- /form-wrap -->
+
+<div class="thankyou" id="thankyou">
+  <div class="ty-icon">✦</div>
+  <h2 class="ty-title">You're all set.</h2>
+  <p class="ty-body">Liah has everything she needs to build your dashboard. Expect something that actually fits your life — not a template with your name on it.</p>
+</div>
+
+<footer class="site-footer">Built with care by <strong>Hemby Point Advisory</strong> · Your responses are private and used only to build your dashboard</footer>
+
+<script>
+let currentStep=1,petCount=0;
+const totalSteps=11,responses={};
+
+function updateProgress(s){
+  const p=Math.round(s/totalSteps*100);
+  document.getElementById('pFill').style.width=p+'%';
+  document.getElementById('pText').textContent='Step '+s+' of '+totalSteps;
+  document.getElementById('pPct').textContent=p+'%';
+}
+
+function nextStep(from){
+  collectStep(from);
+  document.getElementById('step-'+from).classList.remove('active');
+  currentStep=from+1;
+  document.getElementById('step-'+currentStep).classList.add('active');
+  updateProgress(currentStep);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function prevStep(from){
+  document.getElementById('step-'+from).classList.remove('active');
+  currentStep=from-1;
+  document.getElementById('step-'+currentStep).classList.add('active');
+  updateProgress(currentStep);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function collectStep(step){
+  const fields={
+    1:['f-name','f-email','f-work','f-struggle'],
+    2:['f-priority','f-dropping'],
+    3:['f-faith-practice','f-faith-goal'],
+    4:['f-fitness-event','f-fitness-notes'],
+    5:['f-sleep-habits','f-nutrition-notes','f-habits-breaking'],
+    6:['f-career-goals','f-certs-have','f-certs-want'],
+    7:['f-biz-desc','f-biz-goal','f-money-notes'],
+    8:[],
+    9:['f-people','f-nieces','f-social-goals','f-creative','f-travel','f-home-goals','f-personal-goals'],
+    10:['f-colors'],
+    11:['f-tried','f-open-daily','f-anything-else']
+  };
+  (fields[step]||[]).forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&el.value.trim()) responses[id]=el.value.trim();
+  });
+  if(step===4){const d=document.getElementById('f-fitness-date');if(d&&d.value)responses['f-fitness-date']=d.value;}
+  document.querySelectorAll('#step-'+step+' .chip-group').forEach(g=>{
+    const s=[...g.querySelectorAll('.chip.selected')].map(c=>c.dataset.val);
+    if(s.length)responses[g.id]=s.join(', ');
+  });
+  document.querySelectorAll('#step-'+step+' .toggle-group').forEach(g=>{
+    const s=g.querySelector('.toggle-opt.selected');
+    if(s)responses[g.id]=s.dataset.val;
+  });
+  const sc=document.querySelector('#step-'+step+' .scale-opts');
+  if(sc){const s=sc.querySelector('.scale-btn.selected');if(s)responses['scale-personal']=s.dataset.val;}
+  if(step===8){
+    const pets=[];
+    document.querySelectorAll('.pet-entry').forEach(e=>{
+      const p={};
+      ['pet-name','pet-kind','pet-breed','pet-age','pet-vet','pet-vet-date','pet-medicine','pet-notes'].forEach(f=>{
+        const el=e.querySelector('[data-field="'+f+'"]');
+        if(el&&el.value.trim())p[f.replace('pet-','')]=el.value.trim();
+      });
+      if(Object.keys(p).length)pets.push(p);
+    });
+    if(pets.length)responses['pets']=JSON.stringify(pets);
+  }
+}
+
+function addPet(){
+  petCount++;
+  const div=document.createElement('div');
+  div.className='pet-entry';div.id='pet-'+petCount;
+  div.innerHTML=`
+    <div class="pet-title">Pet ${petCount}</div>
+    <button class="remove-pet" onclick="this.parentElement.remove()">✕</button>
+    <div class="field-row" style="margin-bottom:10px">
+      <input type="text" data-field="pet-name" placeholder="Name (e.g. Koda)" />
+      <input type="text" data-field="pet-kind" placeholder="Type (dog, cat, etc.)" />
+    </div>
+    <div class="field-row" style="margin-bottom:10px">
+      <input type="text" data-field="pet-breed" placeholder="Breed" />
+      <input type="text" data-field="pet-age" placeholder="Age" />
+    </div>
+    <div style="margin-bottom:10px">
+      <label class="field-label">Vet name & contact</label>
+      <input type="text" data-field="pet-vet" placeholder="e.g. Banfield Pet Hospital — (410) 555-0123" />
+    </div>
+    <div style="margin-bottom:10px">
+      <label class="field-label">Next vet appointment</label>
+      <input type="date" data-field="pet-vet-date" />
+    </div>
+    <div style="margin-bottom:10px">
+      <label class="field-label">Medications or supplements</label>
+      <input type="text" data-field="pet-medicine" placeholder="e.g. Heartgard monthly, allergy meds daily" />
+    </div>
+    <div>
+      <label class="field-label">Anything else about this pet?</label>
+      <textarea data-field="pet-notes" placeholder="Routines, quirks, things to track..." rows="2"></textarea>
+    </div>`;
+  document.getElementById('pet-list').appendChild(div);
+}
+
+async function submitForm(){
+  collectStep(11);
+  const labels={
+    'f-name':'Name','f-email':'Email','f-work':'Work','tg-adhd':'ADHD / Focus',
+    'f-struggle':'Biggest struggle','chips-areas':'Life areas','f-priority':'Top priority',
+    'f-dropping':'What keeps getting dropped','tg-faith':'Faith practice','tg-bibleplan':'Bible plan',
+    'f-faith-practice':'Faith day-to-day','f-faith-goal':'Faith goal','chips-fitness':'Fitness types',
+    'f-fitness-event':'Fitness event','f-fitness-date':'Event date','chips-freq':'Workout frequency',
+    'f-fitness-notes':'Fitness notes','tg-sleep':'Sleep quality','chips-sleep-hrs':'Sleep goal',
+    'f-sleep-habits':'Sleep habits','chips-nutrition':'Nutrition goals','f-nutrition-notes':'Nutrition notes',
+    'tg-mentalhealth':'Mental health tracking','tg-therapy':'In therapy','f-habits-breaking':'Habits breaking',
+    'chips-career':'Career situation','f-career-goals':'Career goals','f-certs-have':'Certs earned',
+    'f-certs-want':'Certs wanted','tg-school':'Back to school','tg-biz':'Business status',
+    'f-biz-desc':'Business description','f-biz-goal':'Business goal #1','chips-money':'Financial goals',
+    'f-money-notes':'Money notes','pets':'Pets','f-people':'Important people',
+    'f-nieces':'Nieces / nephews','tg-relationship':'Relationship status','tg-social':'Social life',
+    'f-social-goals':'Social goals','f-creative':'Creative projects','f-travel':'Travel goals',
+    'tg-moving':'Moving / housing','f-home-goals':'Home goals','f-personal-goals':'Personal goals',
+    'tg-mode':'Dark/light mode','chips-vibe':'Dashboard vibe','f-colors':'Color preferences',
+    'scale-personal':'Personal feel (1-5)','tg-text':'Morning text briefing',
+    'f-tried':"What hasn't worked",'f-open-daily':'What would make you open it daily','f-anything-else':'Anything else'
+  };
+
+  let body='HEMBY POINT DASHBOARD INTAKE\n================================\n\n';
+  for(const[k,v] of Object.entries(responses)){
+    const lbl=labels[k]||k;
+    if(k==='pets'){
+      try{
+        const ps=JSON.parse(v);
+        ps.forEach((p,i)=>{
+          body+=`Pet ${i+1}:\n`;
+          Object.entries(p).forEach(([pk,pv])=>{body+=`  ${pk}: ${pv}\n`;});
+        });
+      }catch(e){body+=`Pets: ${v}\n`;}
+    } else {
+      body+=`${lbl}: ${v}\n`;
+    }
+  }
+
+  // FORMSPREE SETUP:
+  // 1. Go to formspree.io → sign up with hembypointadvisory@gmail.com
+  // 2. Create a new form → copy the Form ID (e.g. xpzgkwqr)
+  // 3. Replace YOUR_FORMSPREE_ID below with your actual ID
+  // 4. In Formspree dashboard → Integrations → connect Google Sheets
+  // 5. Delete the setup banner div at the top of the HTML
+  const FORMSPREE_ID='YOUR_FORMSPREE_ID';
+
+  if(FORMSPREE_ID!=='YOUR_FORMSPREE_ID'){
+    try{
+      const fd=new FormData();
+      fd.append('_subject','New Dashboard Intake: '+(responses['f-name']||'Someone'));
+      fd.append('_replyto',responses['f-email']||'');
+      fd.append('responses',body);
+      await fetch('https://formspree.io/f/'+FORMSPREE_ID,{method:'POST',body:fd,headers:{Accept:'application/json'}});
+    }catch(e){console.log('Formspree error:',e);}
+  }
+
+  document.querySelector('.form-wrap').style.display='none';
+  document.querySelector('.hero').style.display='none';
+  document.querySelector('.progress-wrap').style.display='none';
+  document.getElementById('thankyou').classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('selected')));
+document.querySelectorAll('.toggle-group').forEach(g=>{
+  g.querySelectorAll('.toggle-opt').forEach(o=>o.addEventListener('click',()=>{
+    g.querySelectorAll('.toggle-opt').forEach(x=>x.classList.remove('selected'));
+    o.classList.add('selected');
+  }));
+});
+document.querySelectorAll('.scale-opts').forEach(g=>{
+  g.querySelectorAll('.scale-btn').forEach(b=>b.addEventListener('click',()=>{
+    g.querySelectorAll('.scale-btn').forEach(x=>x.classList.remove('selected'));
+    b.classList.add('selected');
+  }));
+});
+</script>
+</body>
+</html>

@@ -629,8 +629,37 @@ function updateProgress(s){
   document.getElementById('pPct').textContent=p+'%';
 }
 
+const SAVE_KEY='hemby_intake_v1';
+
+function saveProgress(){
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify({responses,currentStep}));}catch(e){}
+}
+
+function restoreProgress(){
+  try{
+    const saved=localStorage.getItem(SAVE_KEY);
+    if(!saved)return;
+    const data=JSON.parse(saved);
+    if(data.responses)Object.assign(responses,data.responses);
+    // Restore text/textarea values
+    for(const[id,val] of Object.entries(responses)){
+      const el=document.getElementById(id);
+      if(el&&'value'in el)el.value=val;
+    }
+    // Jump to saved step
+    if(data.currentStep&&data.currentStep>1){
+      document.getElementById('step-1').classList.remove('active');
+      currentStep=data.currentStep;
+      const stepEl=document.getElementById('step-'+currentStep);
+      if(stepEl)stepEl.classList.add('active');
+      updateProgress(currentStep);
+    }
+  }catch(e){console.log('restore failed',e);}
+}
+
 function nextStep(from){
   collectStep(from);
+  saveProgress();
   document.getElementById('step-'+from).classList.remove('active');
   currentStep=from+1;
   document.getElementById('step-'+currentStep).classList.add('active');
@@ -639,6 +668,8 @@ function nextStep(from){
 }
 
 function prevStep(from){
+  collectStep(from);
+  saveProgress();
   document.getElementById('step-'+from).classList.remove('active');
   currentStep=from-1;
   document.getElementById('step-'+currentStep).classList.add('active');
@@ -762,23 +793,17 @@ async function submitForm(){
     }
   }
 
-  // FORMSPREE SETUP:
-  // 1. Go to formspree.io → sign up with hembypointadvisory@gmail.com
-  // 2. Create a new form → copy the Form ID (e.g. xpzgkwqr)
-  // 3. Replace xgojzrjo below with your actual ID
-  // 4. In Formspree dashboard → Integrations → connect Google Sheets
-  // 5. Delete the setup banner div at the top of the HTML
-  const FORMSPREE_ID='xgojzrjo';
+  // Send to Formspree
+  try{
+    const fd=new FormData();
+    fd.append('_subject','New Dashboard Intake: '+(responses['f-name']||'Someone'));
+    fd.append('_replyto',responses['f-email']||'');
+    fd.append('responses',body);
+    await fetch('https://formspree.io/f/xgojzrjo',{method:'POST',body:fd,headers:{Accept:'application/json'}});
+  }catch(e){console.log('Formspree error:',e);}
 
-  if(FORMSPREE_ID!=='xgojzrjo'){
-    try{
-      const fd=new FormData();
-      fd.append('_subject','New Dashboard Intake: '+(responses['f-name']||'Someone'));
-      fd.append('_replyto',responses['f-email']||'');
-      fd.append('responses',body);
-      await fetch('https://formspree.io/f/'+FORMSPREE_ID,{method:'POST',body:fd,headers:{Accept:'application/json'}});
-    }catch(e){console.log('Formspree error:',e);}
-  }
+  // Clear saved progress so form is fresh for next visitor
+  try{localStorage.removeItem(SAVE_KEY);}catch(e){}
 
   document.querySelector('.form-wrap').style.display='none';
   document.querySelector('.hero').style.display='none';
@@ -787,6 +812,7 @@ async function submitForm(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
+restoreProgress();
 document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('selected')));
 document.querySelectorAll('.toggle-group').forEach(g=>{
   g.querySelectorAll('.toggle-opt').forEach(o=>o.addEventListener('click',()=>{
